@@ -53,13 +53,29 @@ Intelligent Telegram бот с интеграцией Yandex GPT API, напис
 
 ```
 tgbot/
-├── main.go              # Основной код бота
-├── go.mod               # Go модули
-├── Dockerfile           # Docker образ
-├── docker-compose.yml   # Docker Compose конфигурация
-├── .env                 # Переменные окружения (создать вручную)
-└── README.md           # Этот файл
+├── main.go                    # Точка входа приложения
+├── pkg/                       # Пакеты приложения
+│   ├── config/
+│   │   └── config.go         # Конфигурация и переменные окружения
+│   ├── gpt/
+│   │   └── client.go         # Yandex GPT API клиент
+│   └── bot/
+│       └── handlers.go       # Telegram бот handlers
+├── go.mod                     # Go модули
+├── go.sum                     # Go зависимости
+├── Dockerfile                 # Docker образ
+├── docker-compose.yml         # Docker Compose конфигурация
+├── .env                       # Переменные окружения (создать вручную)
+└── README.md                 # Этот файл
 ```
+
+## Архитектура
+
+### 📦 Пакеты:
+- **`pkg/config`** - управление конфигурацией из переменных окружения
+- **`pkg/gpt`** - клиент для работы с Yandex GPT API
+- **`pkg/bot`** - обработчики Telegram бота
+- **`main.go`** - инициализация и запуск приложения
 
 ## Команды для разработки
 
