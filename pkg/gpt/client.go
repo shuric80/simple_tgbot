@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"tgbot/pkg/iam"
 )
 
 // Request структура запроса к Yandex GPT
@@ -46,17 +47,27 @@ type Alternative struct {
 
 // Client клиент для работы с Yandex GPT API
 type Client struct {
-	catalogID string
-	token     string
-	client    *http.Client
+	catalogID    string
+	token        string
+	tokenManager *iam.TokenManager
+	client       *http.Client
 }
 
-// NewClient создает новый клиент для Yandex GPT
+// NewClient создает новый клиент для Yandex GPT со статическим токеном
 func NewClient(catalogID, token string) *Client {
 	return &Client{
 		catalogID: catalogID,
 		token:     token,
 		client:    &http.Client{},
+	}
+}
+
+// NewClientWithTokenManager создает новый клиент для Yandex GPT с менеджером токенов
+func NewClientWithTokenManager(catalogID string, tokenManager *iam.TokenManager) *Client {
+	return &Client{
+		catalogID:    catalogID,
+		tokenManager: tokenManager,
+		client:       &http.Client{},
 	}
 }
 
@@ -90,7 +101,14 @@ func (c *Client) SendMessage(userMessage string) (string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.token)
+
+	// Получаем токен
+	token, err := c.getToken()
+	if err != nil {
+		return "", fmt.Errorf("error getting token: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -117,4 +135,19 @@ func (c *Client) SendMessage(userMessage string) (string, error) {
 	}
 
 	return response.Result.Alternatives[0].Message.Text, nil
+}
+
+// getToken возвращает токен для аутентификации
+func (c *Client) getToken() (string, error) {
+	// Если есть менеджер токенов, используем его
+	if c.tokenManager != nil {
+		return c.tokenManager.GetToken()
+	}
+
+	// Иначе используем статический токен
+	if c.token == "" {
+		return "", fmt.Errorf("no token available")
+	}
+
+	return c.token, nil
 }

@@ -9,10 +9,15 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - YANDEX_CLOUD_CATALOG_ID=${YANDEX_CLOUD_CATALOG_ID}
       - YANDEX_CLOUD_TOKEN=${YANDEX_CLOUD_TOKEN}
+      - YANDEX_AUTH_TYPE=${YANDEX_AUTH_TYPE:-static_token}
+      - YANDEX_SERVICE_ACCOUNT_KEY_FILE=${YANDEX_SERVICE_ACCOUNT_KEY_FILE}
+      - YANDEX_SERVICE_ACCOUNT_KEY_JSON=${YANDEX_SERVICE_ACCOUNT_KEY_JSON}
+      - YANDEX_OAUTH_TOKEN=${YANDEX_OAUTH_TOKEN}
     env_file:
       - .env
     volumes:
       - ./logs:/var/log/tgbot
+      - ./authorized_key.json:/app/authorized_key.json:ro
     networks:
       - tgbot_network
 
