@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  tgbot:
+    build: .
+    container_name: telegram_bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/var/log/tgbot
+    networks:
+      - tgbot_network
+
+networks:
+  tgbot_network:
+    driver: bridge
